@@ -58,21 +58,27 @@ class Program
             Console.WriteLine($"{post.Title}: '{post.LastCommentDate}', '{post.LastCommentText}'");
         }
 
-
-        Console.WriteLine("How many last comments each user left:");
+        //-----------------------------How many last comments each user left-------------------------
         // 'last comment' is the latest Comment in each Post
         //ToDo: write a query and dump the data to console
         // Expected result (format could be different, e.g. object serialized to JSON is ok):
         // Ivan: 2
         // Petr: 1
 
-            
-        // Console.WriteLine(
-        //     JsonSerializer.Serialize(BlogService.NumberOfCommentsPerUser(context)));
-        // Console.WriteLine(
-        //     JsonSerializer.Serialize(BlogService.PostsOrderedByLastCommentDate(context)));
-        // Console.WriteLine(
-        //     JsonSerializer.Serialize(BlogService.NumberOfLastCommentsLeftByUser(context)));
+        var lastCommentCount = context.BlogPosts.Select(x => x.Comments.OrderByDescending(c => c.CreatedDate).FirstOrDefault().UserName)
+            .GroupBy(x => x)
+            .Select(x => new 
+            { 
+                Name = x.Key, 
+                Count = x.Count() 
+            }).ToList();
+
+        Console.WriteLine("How many last comments each user left:");
+
+        foreach (var item in lastCommentCount)
+        {
+            Console.WriteLine($"{item.Name}: {item.Count}");
+        }
 
     }
 
