@@ -22,13 +22,15 @@ class Program
 
 
         //-----------------------------How many comments each user left-------------------------
-        Console.WriteLine("How many comments each user left:");
         //ToDo: write a query and dump the data to console
         // Expected result (format could be different, e.g. object serialized to JSON is ok):
         // Ivan: 4
         // Petr: 2
         // Elena: 3
+
         var comments = context.BlogComments.GroupBy(c => c.UserName).Select(c => new { User = c.Key, Comments = c.Count() }).ToList();
+
+        Console.WriteLine("How many comments each user left:");
 
         foreach (var comment in comments)
         {
@@ -36,12 +38,25 @@ class Program
         }
 
         //-----------------------------Posts ordered by date of last comment. Result should include text of last comment-------------------------
-        Console.WriteLine("Posts ordered by date of last comment. Result should include text of last comment:");
         //ToDo: write a query and dump the data to console
         // Expected result (format could be different, e.g. object serialized to JSON is ok):
         // Post2: '2020-03-06', '4'
         // Post1: '2020-03-05', '8'
         // Post3: '2020-02-14', '9'
+
+        var posts = context.BlogPosts.Select(p => new
+        {
+            Title = p.Title,
+            LastCommentDate = p.Comments.OrderByDescending(c => c.CreatedDate).FirstOrDefault().CreatedDate,
+            LastCommentText = p.Comments.OrderByDescending(c => c.CreatedDate).FirstOrDefault().Text
+        }).OrderByDescending(x => x.LastCommentDate).ToList();
+
+        Console.WriteLine("Posts ordered by date of last comment. Result should include text of last comment:");
+
+        foreach(var post in posts)
+        {
+            Console.WriteLine($"{post.Title}: '{post.LastCommentDate}', '{post.LastCommentText}'");
+        }
 
 
         Console.WriteLine("How many last comments each user left:");
